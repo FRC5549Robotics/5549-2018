@@ -31,7 +31,8 @@ class MyRobot(wpilib.IterativeRobot):
         """This function is called periodically during operator control."""
         #left_stick = self.stick.getRawAxis(1)/2
         #right_stick = self.stick.getRawAxis(5)/2
-        left_stick = self.stick.getX(XboxController.Hand.kLeft)
+        left_stick = self.stick.getY(wpilib.XboxController.Hand.kLeft)
+        right_stick = self.stick.getX(wpilib.XboxController.Hand.kRight)
         self.robot_drive.tankDrive(left_stick, right_stick)
 
     def testPeriodic(self):
