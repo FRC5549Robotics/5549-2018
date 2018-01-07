@@ -1,6 +1,7 @@
 import wpilib
 
 
+# noinspection PyAttributeOutsideInit
 class MyRobot(wpilib.IterativeRobot):
     def robotInit(self):
         """
@@ -11,7 +12,6 @@ class MyRobot(wpilib.IterativeRobot):
         self.robot_drive = wpilib.RobotDrive(0, 1, 3, 2)
         self.robot_drive.setExpiration(0.1)
         self.stick = wpilib.XboxController(1)
-
 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -29,8 +29,8 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        #left_stick = self.stick.getRawAxis(1)/2
-        #right_stick = self.stick.getRawAxis(5)/2
+        # left_stick = self.stick.getRawAxis(1)/2
+        # right_stick = self.stick.getRawAxis(5)/2
         left_stick = self.stick.getY(wpilib.XboxController.Hand.kLeft)
         right_stick = self.stick.getX(wpilib.XboxController.Hand.kRight)
         self.robot_drive.tankDrive(left_stick, right_stick)
