@@ -36,6 +36,8 @@ class MyRobot(wpilib.IterativeRobot):
         #left_stick = self.stick.getY(wpilib.XboxController.Hand.kLeft)
         #right_stick = self.stick.getY(wpilib.XboxController.Hand.kRight)
 
+        self.robot_drive.tankDrive(left_stick, right_stick)
+
     def testPeriodic(self):
         """This function is called periodically during test mode."""
         wpilib.LiveWindow.run()
