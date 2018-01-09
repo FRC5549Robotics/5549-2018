@@ -30,18 +30,11 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-<<<<<<< HEAD
 
         left_stick = self.stick.getRawAxis(1)/2
         right_stick = self.stick.getRawAxis(5)/2
         #left_stick = self.stick.getY(wpilib.XboxController.Hand.kLeft)
         #right_stick = self.stick.getY(wpilib.XboxController.Hand.kRight)
-=======
-        #left_stick = self.stick.getRawAxis(1)/2
-        #right_stick = self.stick.getRawAxis(5)/2
-        left_stick = self.stick.getX(XboxController.Hand.kLeft)
-        self.robot_drive.tankDrive(left_stick, right_stick)
->>>>>>> parent of f377bc8... Rev1.0
 
     def testPeriodic(self):
         """This function is called periodically during test mode."""
