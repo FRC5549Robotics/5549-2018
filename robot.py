@@ -11,8 +11,12 @@ class MyRobot(wpilib.IterativeRobot):
 
         self.robot_drive = wpilib.RobotDrive(0, 1, 3, 2)
         self.robot_drive.setExpiration(0.1)
+<<<<<<< HEAD
         #self.stick = wpilib.XboxController(1)
         self.stick = wpilib.Joystick(1)
+=======
+        self.stick = wpilib.XboxController(1)
+>>>>>>> 702b4981f5dc826f94b85527b42de3a5cec6b39e
 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -31,11 +35,14 @@ class MyRobot(wpilib.IterativeRobot):
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
 <<<<<<< HEAD
+<<<<<<< HEAD
         left_stick = self.stick.getRawAxis(1)/2
         right_stick = self.stick.getRawAxis(5)/2
         #left_stick = self.stick.getY(wpilib.XboxController.Hand.kLeft)
         #right_stick = self.stick.getY(wpilib.XboxController.Hand.kRight)
 =======
+=======
+>>>>>>> 702b4981f5dc826f94b85527b42de3a5cec6b39e
         # left_stick = self.stick.getRawAxis(1)/2
         # right_stick = self.stick.getRawAxis(5)/2
         left_stick = self.stick.getY(wpilib.XboxController.Hand.kLeft)
