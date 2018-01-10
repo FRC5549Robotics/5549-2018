@@ -9,7 +9,7 @@ class MyRobot(wpilib.IterativeRobot):
         should be used for any initialization code.
         """
 
-        self.robot_drive = wpilib.RobotDrive(0, 1, 3, 2)
+        self.robot_drive = wpilib.RobotDrive(0, 1, 2, 3)
         self.robot_drive.setExpiration(0.1)
         #self.stick = wpilib.XboxController(1)
         self.stick = wpilib.Joystick(1)
