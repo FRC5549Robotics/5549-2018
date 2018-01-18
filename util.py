@@ -13,25 +13,25 @@ from subprocess import call
 
 
 def _test():
-    call(["python", "robot.py", "test", "--", "-x"], shell=True)
+    call(["python", "robot2.py", "test", "--", "-x"], shell=True)
 
 
 def _deploy():
     if len(sys.argv) > 2:
         if "--skip-tests" in sys.argv[2]:
-            call(["python", "robot.py", "deploy", "--skip-tests"], shell=True)
+            call(["python", "robot2.py", "deploy", "--skip-tests"], shell=True)
             return
 
-    call(["python", "robot.py", "deploy"], shell=True)
+    call(["python", "robot2.py", "deploy"], shell=True)
 
 
 def _deploy_netconsole():
     if len(sys.argv) > 2:
         if "--skip-tests" in sys.argv[2]:
-            call(["python", "robot.py", "deploy", "--nc", "--skip-tests"], shell=True)
+            call(["python", "robot2.py", "deploy", "--nc", "--skip-tests"], shell=True)
             return
 
-    call(["python", "robot.py", "deploy", "--nc"], shell=True)
+    call(["python", "robot2.py", "deploy", "--nc"], shell=True)
 
 
 def _update_robotpy():
