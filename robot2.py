@@ -19,6 +19,9 @@ class MyRobot(wpilib.IterativeRobot):
         self.rearLeftMotor = wpilib.Victor(2)
         self.frontRightMotor = wpilib.Victor(3)
         self.rearRightMotor = wpilib.Victor(4)
+        self.omnomleft = wpilib.Spark(5)
+        self.omnomright = wpilib.Spark(6)
+        self.pneumatic = wpilib.Compressor(7)
 
         self.left = wpilib.SpeedControllerGroup(self.frontLeftMotor, self.rearLeftMotor)
         self.right = wpilib.SpeedControllerGroup(self.frontRightMotor, self.rearRightMotor)
