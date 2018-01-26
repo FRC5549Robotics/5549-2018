@@ -6,6 +6,7 @@
 
 import wpilib
 from wpilib.drive import DifferentialDrive
+from wpilib.doublesolenoid import DoubleSolenoid
 
 
 class MyRobot(wpilib.IterativeRobot):
@@ -28,6 +29,13 @@ class MyRobot(wpilib.IterativeRobot):
         # joysticks 1 on the driver station
         self.stick = wpilib.Joystick(1)
 
+        self.Compressor = wpilib.Compressor(0)
+        self.Compressor.setClosedLoopControl(True)
+        self.enabled = self.Compressor.enabled()
+        self.PSV = self.Compressor.getPressureSwitchValue()
+        self.DS = wpilib.DoubleSolenoid(0, 1)
+        self.Compressor.start()
+
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
         self.drive.setSafetyEnabled(True)
@@ -44,6 +52,16 @@ class MyRobot(wpilib.IterativeRobot):
         #adjusted_right_stick = right_stick/divisor
 
         self.drive.tankDrive(-left_stick, -right_stick)
+
+        if self.stick.getRawButton(5):
+            self.DS.set(DoubleSolenoid.Value.kForward)
+        elif self.stick.getRawButton(6):
+            self.DS.set(DoubleSolenoid.Value.kReverse)
+        elif self.stick.getRawButton(1):
+            self.Compressor.stop()
+        elif self.stick.getRawButton(4):
+            self.Compressor.start()
+
 
 if __name__ == '__main__':
     wpilib.run(MyRobot)
