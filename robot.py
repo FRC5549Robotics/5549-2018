@@ -19,9 +19,6 @@ class MyRobot(wpilib.IterativeRobot):
         self.rearLeftMotor = wpilib.Victor(2)
         self.frontRightMotor = wpilib.Victor(3)
         self.rearRightMotor = wpilib.Victor(4)
-        self.omnomleft = wpilib.Spark(5)
-        self.omnomright = wpilib.Spark(6)
-        self.pneumatic = wpilib.Compressor(7)
 
         self.left = wpilib.SpeedControllerGroup(self.frontLeftMotor, self.rearLeftMotor)
         self.right = wpilib.SpeedControllerGroup(self.frontRightMotor, self.rearRightMotor)
@@ -29,15 +26,19 @@ class MyRobot(wpilib.IterativeRobot):
         self.drive = DifferentialDrive(self.left, self.right)
         self.drive.setExpiration(0.1)
 
-        # joysticks 1 on the driver station
+        # joystick 1 on the driver station
         self.stick = wpilib.Joystick(1)
 
+        # Initialization of the pneumatic system
         self.Compressor = wpilib.Compressor(0)
         self.Compressor.setClosedLoopControl(True)
         self.enabled = self.Compressor.enabled()
         self.PSV = self.Compressor.getPressureSwitchValue()
         self.DS = wpilib.DoubleSolenoid(0, 1)
         self.Compressor.start()
+
+        # Initialization of the camera server
+        wpilib.CameraServer.launch()
 
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
@@ -56,6 +57,7 @@ class MyRobot(wpilib.IterativeRobot):
 
         self.drive.tankDrive(-left_stick, -right_stick)
 
+        # Basic pneumatic operations using joystick
         if self.stick.getRawButton(5):
             self.DS.set(DoubleSolenoid.Value.kForward)
         elif self.stick.getRawButton(6):
