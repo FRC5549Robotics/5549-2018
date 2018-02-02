@@ -15,16 +15,17 @@ class MyRobot(wpilib.IterativeRobot):
         '''Robot initialization function'''
 
         # object that handles basic drive operations
-        self.frontLeftMotor = wpilib.Victor(1)
-        self.rearLeftMotor = wpilib.Victor(2)
-        self.frontRightMotor = wpilib.Victor(3)
-        self.rearRightMotor = wpilib.Victor(4)
+        self.frontLeftMotor = wpilib.Talon(1)
+        self.rearLeftMotor = wpilib.Talon(2)
+        self.frontRightMotor = wpilib.Talon(3)
+        self.rearRightMotor = wpilib.Talon(4)
 
         self.left = wpilib.SpeedControllerGroup(self.frontLeftMotor, self.rearLeftMotor)
         self.right = wpilib.SpeedControllerGroup(self.frontRightMotor, self.rearRightMotor)
 
         self.drive = DifferentialDrive(self.left, self.right)
         self.drive.setExpiration(0.1)
+        self.timer = wpilib.Timer()
 
         # joystick 1 on the driver station
         self.stick = wpilib.Joystick(1)
@@ -39,6 +40,18 @@ class MyRobot(wpilib.IterativeRobot):
 
         # Initialization of the camera server
         wpilib.CameraServer.launch()
+
+    def autonomousInit(self):
+        """This function is run once each time the robot enters autonomous mode."""
+        self.timer.stop()
+        self.timer.start()
+
+    def autonomousPeriodic(self):
+        """This function is called periodically during autonomous."""
+        if self.timer < 4.0:
+            self.drive.tankDrive(0.5, 0.5)
+        else:
+            self.drive.tankDrive(0, 0)
 
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
