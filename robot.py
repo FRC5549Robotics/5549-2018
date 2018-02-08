@@ -46,12 +46,36 @@ class MyRobot(wpilib.IterativeRobot):
         self.timer.stop()
         self.timer.start()
 
+        def rightturnDrive():
+            self.drive.tankDrive(0, 0.5)
+
+        def leftturnDrive():
+            self.drive.tankDrive(0.5, 0)
+
+        def forwardDrive():
+            self.drive.tankDrive(0.5, 0.5)
+
+        def reverseDrive():
+            self.drive.tankDrive(-0.5, -0.5)
+
+        def rightpointDrive():
+            self.drive.tankDrive(-0.5, 0.5)
+
+        def leftpointDrive():
+            self.drive.tankDrive(0.5, -0.5)
+
     def autonomousPeriodic(self):
         """This function is called periodically during autonomous."""
-        if self.timer < 4.0:
-            self.drive.tankDrive(0.5, 0.5)
-        else:
-            self.drive.tankDrive(0, 0)
+        self.timer.reset()
+        self.timer.start()
+
+        if self.timer.get() <= 6:
+            forwardDrive()
+        elif self.timer.get() <= 7:
+            rightturnDrive()
+            """self.rightpointDrive"""
+        elif self.timer.get() <= 11:
+            forwardDrive()
 
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
@@ -59,14 +83,14 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         '''Runs the motors with tank steering'''
-        left_stick = self.stick.getRawAxis(1)/1.5
-        right_stick = self.stick.getRawAxis(5)/1.5
+        left_stick = self.stick.getRawAxis(1) / 1.5
+        right_stick = self.stick.getRawAxis(5) / 1.5
         '''if right_stick < 0:
             divisor = 2
         else:
             divisor = 2.3'''
 
-        #adjusted_right_stick = right_stick/divisor
+        # adjusted_right_stick = right_stick/divisor
 
         self.drive.tankDrive(-left_stick, -right_stick)
 
