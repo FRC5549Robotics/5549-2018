@@ -14,16 +14,31 @@ class MyRobot(wpilib.IterativeRobot):
         '''Robot initialization function'''
 
         # object that handles basic drive operations
-        self.frontLeftMotor = wpilib.Victor(1)
-        self.rearLeftMotor = wpilib.Victor(2)
-        self.frontRightMotor = wpilib.Victor(3)
-        self.rearRightMotor = wpilib.Victor(4)
+        self.frontRightMotor = wpilib.Victor(0)
+        self.rearRightMotor = wpilib.Victor(1)
+        self.frontLeftMotor = wpilib.Victor(2)
+        self.rearLeftMotor = wpilib.Victor(3)
 
+        # object that handles basic intake operations
+        self.omnomLeft = wpilib.Spark(7)
+        self.omnomRight = wpilib.Spark(8)
+
+        # defining motor groups
         self.left = wpilib.SpeedControllerGroup(self.frontLeftMotor, self.rearLeftMotor)
         self.right = wpilib.SpeedControllerGroup(self.frontRightMotor, self.rearRightMotor)
 
+        # defining intake/output motor groups
+        self.omnom = wpilib.SpeedControllerGroup(self.omnomLeft, self.omnomRight)
+
+        # setting up drive group for drive motors
         self.drive = DifferentialDrive(self.left, self.right)
         self.drive.setExpiration(0.1)
+
+        # setting up drive group for intake motors
+        self.omnomop = DifferentialDrive(self.omnom)
+        self.omnom.setExpiration(0.1)
+
+        # defines timer for autonomous
         self.timer = wpilib.Timer()
 
         # joystick 1 on the driver station
@@ -45,7 +60,7 @@ class MyRobot(wpilib.IterativeRobot):
     def autonomousPeriodic(self):
         '''This function is called periodically during autonomous.'''
 
-        # Gets distance in the form of voltage from ultrasonic sensor.
+        # Gets distance in the form of voltage from ultrasonic sensor
         distance = self.AnalogInput.getVoltage()
 
         # Uses voltage to meter to determine the distance to obstacle
@@ -54,22 +69,22 @@ class MyRobot(wpilib.IterativeRobot):
         else:
             self.drive.tankDrive(0, 0)
 
-        gameData = DriverStation.getGameSpecificMessage()
-        position = DriverStation.getLocation()
+        gameData = DriverStation.getInstance().getGameSpecificMessage() #Gets color of switches and scale in string form
+        position = 3    # Change position based on need
 
         def l():
-            if self.timer.get() < 5.0:
-                self.drive.tankDrive(0.5, 0.5)  # Drive forwards for 5 seconds at half speed.
-            elif 5.0 < self.timer.get() < 6.0:
-                self.drive.tankDrive(0, 0.5)  # Turn right for 1 second at half speed.
-            elif self.timer.get() > 6.0:
+            if self.timer.get() < 3.0:
+                self.drive.tankDrive(0.55, 0.5)  # Drive forwards for 5 seconds at half speed.
+            elif 3.0 < self.timer.get() < 4.0:
+                self.drive.tankDrive(0, 0.5)  # Turn left for 1 second at half speed.
+            elif self.timer.get() > 4.0:
                 self.drive.tankDrive(0, 0)  # Stop after 6 seconds.
             else:
                 self.drive.tankDrive(0, 0)
 
         def r():
             if self.timer.get() < 5.0:
-                self.drive.tankDrive(0.5, 0.5)  # Drive forwards for 5 seconds at half speed.
+                self.drive.tankDrive(0.55, 0.5)  # Drive forwards for 5 seconds at half speed.
             elif 5.0 < self.timer.get() < 6.0:
                 self.drive.tankDrive(0.5, 0)  # Turn right for 1 second at half speed.
             elif self.timer.get() > 6.0:
@@ -127,17 +142,21 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         '''Runs the motors with tank steering'''
-        left_stick = self.stick.getRawAxis(1)/1.5   # Slows down motors
-        right_stick = self.stick.getRawAxis(5)/1.5
-        '''if right_stick < 0:
+        left_stick = self.stick.getRawAxis(1)/2   # Slows down motors
+        right_stick = self.stick.getRawAxis(5)/2
+
+        left_trigger = self.stick.getRawButton(2)
+        right_trigger = self.stick.getRawButton(3)
+        '''
+        if right_stick < 0:
             divisor = 2
         else:
-            divisor = 2.3'''
+            divisor = 2.1
 
-        #adjusted_right_stick = right_stick/divisor
-
+        adjusted_right_stick = right_stick/divisor
+        '''
         self.drive.tankDrive(-left_stick, -right_stick)
-
+        self.omnomop.arcadeDrive(-left_trigger, right_trigger)
 
 
 if __name__ == '__main__':
