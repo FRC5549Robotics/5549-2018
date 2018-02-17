@@ -137,14 +137,14 @@ class MyRobot(wpilib.IterativeRobot):
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
         self.drive.setSafetyEnabled(True)
-
-    def teleopPeriodic(self):
-        '''Runs the motors with tank steering'''
-
+        
+        
         # controller mapping for tank steering
         left_stick = self.stick.getRawAxis(1)/2   # Slows down motors
         right_stick = self.stick.getRawAxis(5)/2
 
+    def teleopPeriodic(self):
+        '''Runs the motors with tank steering'''
         # basic intake controller mapping with relative speed
         if self.stick.getRawButton(2):
             self.omnomLeft.set(-0.5)
