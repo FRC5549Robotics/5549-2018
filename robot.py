@@ -322,10 +322,32 @@ class MyRobot(wpilib.IterativeRobot):
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
         self.drive.setSafetyEnabled(True)
-
+		
     def teleopPeriodic(self):
         '''Runs the motors with tank steering'''
 
+		left_toggle = 0
+    	right_toggle = 0
+
+    	left_speed = 0.5
+    	right_speed = 0.5
+    
+    	if self.stickLeft.getRawButton(1):
+        	if left_toggle == 0:
+            	left_speed = 0.25
+            	left_toggle = 1
+        	elif left_toggle == 1:
+            	left_speed = 0.5
+            	left_toggle = 0
+
+    	if self.stickRight.getRawButton(1):
+        	if right_toggle == 0:
+            	right_speed = 0.25
+            	right_toggle = 1
+        	elif right_toggle == 1:
+            	right_speed = 0.5
+				right_toggle = 0
+		
         # gets value of hall-effect sensor - bool
         is_tall = self.DigitalInput.get()
 
