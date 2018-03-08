@@ -9,7 +9,8 @@
 import wpilib
 from wpilib.drive import DifferentialDrive
 from wpilib import DriverStation
-from wpilib import adxrs450_gyro
+from wpilib import CameraServer
+from wpilib import ADXRS450_Gyro
 
 '''
 Xbox 360 Controller
@@ -21,7 +22,7 @@ AXIS MAPPING
     1 - Y-Axis (left)   |   5 - Y-Axis (right)
     2 - Trigger (left)  |
     3 - Trigger (right) |
-
+    
 BUTTON MAPPING 
     1 - A   |   5 - Bumper (left)  
     2 - B   |   6 - Bumper (right)  
@@ -42,11 +43,11 @@ class MyRobot(wpilib.IterativeRobot):
         self.rearLeftMotor = wpilib.Victor(3)
 
         # object that handles basic intake operations
-        self.omnom_left_motor = wpilib.Spark(7)  # make sure channels are correct
+        self.omnom_left_motor = wpilib.Spark(7)
         self.omnom_right_motor = wpilib.Spark(8)
 
         # object that handles basic lift operations
-        self.liftMotor = wpilib.Spark(4)  # make sure channel is correct
+        self.liftMotor = wpilib.Spark(4)
 
         # object that handles basic climb operations
         self.winch1 = wpilib.Spark(5)
@@ -75,18 +76,19 @@ class MyRobot(wpilib.IterativeRobot):
         self.stick = wpilib.Joystick(1)
         self.stick2 = wpilib.Joystick(2)
 
-        # initialization of the camera server
-        wpilib.CameraServer.launch()
-
         # initialization of the ultrasonic sensors
         self.AnalogInput_one = wpilib.AnalogInput(2)
         self.AnalogInput_two = wpilib.AnalogInput(3)
 
         # initialization of the hall-effect sensors
-        self.DigitalInput = wpilib.DigitalInput(2)
+        self.DigitalInput = wpilib.DigitalInput(1)
 
-        # initialization of the gyro
-        # self.gyro = wpilib.ADXRS450_Gyro()
+        # initialization of the FMS
+        self.DS = DriverStation.getInstance()
+        self.PS = DriverStation.getInstance()
+
+        # initialization of the camera server
+        wpilib.CameraServer.launch()
 
     def autonomousInit(self):
         '''This function is run once each time the robot enters autonomous mode.'''
@@ -97,28 +99,10 @@ class MyRobot(wpilib.IterativeRobot):
     def autonomousPeriodic(self):
         '''This function is called periodically during autonomous.'''
 
-        # gets distance from ultrasonic sensor - voltage
-        distance = self.AnalogInput_one.getVoltage()
-        distance1 = self.AnalogInput_two.getVoltage()
-
-        '''
-        # Uses voltage to meter to determine the distance to obstacle
-        if distance > 0.75:
-            self.drive.tankDrive(0.575, 0.5)
-        else:
-            self.drive.tankDrive(0, 0)
-
-        if distance1 > 0.75:
-            self.drive.tankDrive(0.5, 0.5)
-        else:
-            self.drive.tankDrive(0, 0)
-        '''
-
         # gets randomization of field elements
-        gameData = DriverStation.getInstance().getGameSpecificMessage()
+        gameData = self.DS.getGameSpecificMessage()
         # gets location of robot on the field
-        position = DriverStation.getInstance().getLocation()
-
+        position = self.PS.getLocation()
         # position = 4
 
         # basic autonomous functions
@@ -160,10 +144,6 @@ class MyRobot(wpilib.IterativeRobot):
             self.omnom_left.set(0.5)
             self.omnom_right.set(-0.5)
 
-        def take_cube():
-            self.omnom_left.set(-0.5)
-            self.omnom_right.set(0.5)
-
         def HansZeTransmissionBroke():
             self.drive.tankDrive(0, 0)
 
@@ -173,21 +153,6 @@ class MyRobot(wpilib.IterativeRobot):
 
         # (Below) Activate during tests
         # position = 4
-
-        def lift_test():
-            if self.timer.get() < 0.1:
-                lift_activate()
-            elif 0.20 < self.timer.get() < 0.5:
-                lift_lower()
-            elif 1.5 < self.timer.get() < 1.75:
-                self.omnom_left.set(-0.5)
-                self.omnom_right.set(0.5)
-            elif 3.0 < self.timer.get() < 3.5:
-                lift_activate()
-            elif 4.0 < self.timer.get() < 4.25:
-                lift_lower()
-            elif self.timer.get() > 4.25:
-                stop_motor()
 
         def left_switch():
             if self.timer.get() < 1.85:
@@ -236,11 +201,11 @@ class MyRobot(wpilib.IterativeRobot):
                 stop_motor()
 
         def left_scale():
-            if self.timer.get() < 7.30:
+            if self.timer.get() < 2:
                 straight_speed()
-            elif 7.30 < self.timer.get() < 8.05:
+            elif 2 < self.timer.get() < 3:
                 left_turn_speed()
-            elif self.timer.get() > 8.05:
+            elif self.timer.get() > 4:
                 stop_motor()
             else:
                 stop_motor()
@@ -275,49 +240,85 @@ class MyRobot(wpilib.IterativeRobot):
                 stop_motor()
 
         def center_straight():
-            if self.timer.get() < 1.0:
+            if self.timer.get() < 0.2:
+                lift_activate()
+            elif 0.2 < self.timer.get() < 0.5:
+                lift_lower()
+            elif 0.5 < self.timer.get() < 0.75:
+                self.omnom_left.set(-0.5)
+                self.omnom_right.set(0.5)
+            elif 0.75 < self.timer.get() < 1.5:
+                lift_activate()
+            elif 1.5 < self.timer.get() < 4.5:
                 straight_slow_speed()
-            elif self.timer.get() > 1.0:
+            elif 4.5 < self.timer.get() < 4.00:
+                dispense_cube()
+
+        def straight():
+            if self.timer.get() < 3.5:
+                straight_slow_speed()
+            elif self.timer.get() > 3.5:
                 stop_motor()
 
-        ########################################
+        ###############################################
 
         # L-L-R
         if gameData == "LLR" and position == 1:
-            left_switch()
+            straight()                          # left switch
         elif gameData == "LLR" and position == 2:
-            center_straight()
+            straight()
         elif gameData == "LLR" and position == 3:
-            right_scale()
+            straight()
 
         # L-R-L
         elif gameData == "LRL" and position == 1:
-            left_switch()
+            straight()                          # left switch
         elif gameData == "LRL" and position == 2:
-            center_straight()
+            straight()
         elif gameData == "LRL" and position == 3:
-            right_scale()
+            straight()
 
         # R-L-L
         elif gameData == "RLL" and position == 1:
-            left_scale()
+            straight()
         elif gameData == "RLL" and position == 2:
             center_straight()
         elif gameData == "RLL" and position == 3:
-            right_switch()
+            straight()                          # right switch
 
         # R-L-R
         elif gameData == "RLR" and position == 1:
-            left_scale()
+            straight()
         elif gameData == "RLR" and position == 2:
             center_straight()
         elif gameData == "RLR" and position == 3:
-            right_switch()
+            straight()                          # right switch
+
+        # R-R-R
+        elif gameData == "RRR" and position == 1:
+            straight()
+        elif gameData == "RRR" and position == 2:
+            center_straight()
+        elif gameData == "RRR" and position == 3:
+            straight()                          # right switch
+
+        # L-L-L
+        elif gameData == "LLL" and position == 1:
+            straight()                          # left switch
+        elif gameData == "LLL" and position == 2:
+            straight()
+        elif gameData == "LLL" and position == 3:
+            straight()
+
+        # Other situations
+        else:
+            straight()
 
         ''' tests'''
+        '''
         if position == 4:
             lift_test()
-
+        '''
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
         self.drive.setSafetyEnabled(True)
@@ -333,18 +334,18 @@ class MyRobot(wpilib.IterativeRobot):
         right_stick = self.stick.getRawAxis(5)
 
         # controller mapping for omnom operation
-        left_omnom_stick = self.stick2.getRawAxis(1)
-        right_omnom_stick = self.stick2.getRawAxis(5)
+        left_omnom_stick = self.stick2.getRawAxis(1)/1.15
+        right_omnom_stick = self.stick2.getRawAxis(5)/1.15
 
         # lift controller mapping with relative speed
         if self.stick2.getRawAxis(3):
             self.liftMotor.set(self.stick2.getRawAxis(3))
-            if is_tall == True:
-                self.liftMotor.set(0.3)
+            #if is_tall == True:
+                #self.liftMotor.set(0.3)
         elif self.stick2.getRawAxis(2):
             self.liftMotor.set(-self.stick2.getRawAxis(2))
-            if is_tall == True:
-                self.liftMotor.set(0.3)
+            #if is_tall == True:
+                #self.liftMotor.set(0.3)
         else:
             self.liftMotor.set(0)
 
@@ -367,9 +368,12 @@ class MyRobot(wpilib.IterativeRobot):
 
         adjusted_left_stick = left_stick/divisor
         '''
-        self.omnom.tankDrive(-left_omnom_stick, -right_omnom_stick)
 
-        self.drive.tankDrive(-left_stick, -right_stick)
+        self.omnom.tankDrive(left_omnom_stick, right_omnom_stick)     # drives intake system using tank steering
+
+        self.drive.tankDrive(-left_stick, -right_stick)                 # drives drive system using tank steering
+
+
 
 
 if __name__ == '__main__':
