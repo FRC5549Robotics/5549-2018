@@ -13,6 +13,9 @@ from wpilib import CameraServer
 from wpilib import ADXRS450_Gyro
 
 '''
+Logitech Joysticks
+    Joystick 0 --> left motors(red label)
+    Joystick 3 --> right motors(green label)
 Xbox 360 Controller
     Joystick 1 --> drive train control
     Joystick 2 --> attachment control
@@ -22,7 +25,7 @@ AXIS MAPPING
     1 - Y-Axis (left)   |   5 - Y-Axis (right)
     2 - Trigger (left)  |
     3 - Trigger (right) |
-    
+
 BUTTON MAPPING 
     1 - A   |   5 - Bumper (left)  
     2 - B   |   6 - Bumper (right)  
@@ -43,11 +46,11 @@ class MyRobot(wpilib.IterativeRobot):
         self.rearLeftMotor = wpilib.Victor(3)
 
         # object that handles basic intake operations
-        self.omnom_left_motor = wpilib.Spark(7)
+        self.omnom_left_motor = wpilib.Spark(7)  # make sure channels are correct
         self.omnom_right_motor = wpilib.Spark(8)
 
         # object that handles basic lift operations
-        self.liftMotor = wpilib.Spark(4)
+        self.liftMotor = wpilib.Spark(4)  # make sure channel is correct
 
         # object that handles basic climb operations
         self.winch1 = wpilib.Spark(5)
@@ -72,13 +75,10 @@ class MyRobot(wpilib.IterativeRobot):
         # defines timer for autonomous
         self.timer = wpilib.Timer()
 
-        # joystick 1 & 2 on the driver station
-        self.stick = wpilib.Joystick(1)
-        self.stick2 = wpilib.Joystick(2)
-
-        # initialization of the ultrasonic sensors
-        self.AnalogInput_one = wpilib.AnalogInput(2)
-        self.AnalogInput_two = wpilib.AnalogInput(3)
+        # joystick 0 & on the driver station
+        self.leftStick = wpilib.Joystick(0)
+        self.rightStick = wpilib.Joystick(1)
+        self.stick = wpilib.Joystick(2)
 
         # initialization of the hall-effect sensors
         self.DigitalInput = wpilib.DigitalInput(1)
@@ -92,17 +92,16 @@ class MyRobot(wpilib.IterativeRobot):
 
     def autonomousInit(self):
         '''This function is run once each time the robot enters autonomous mode.'''
-        # self.gyro.reset()
         self.timer.reset()
         self.timer.start()
 
     def autonomousPeriodic(self):
         '''This function is called periodically during autonomous.'''
-
         # gets randomization of field elements
         gameData = self.DS.getGameSpecificMessage()
         # gets location of robot on the field
         position = self.PS.getLocation()
+
         # position = 4
 
         # basic autonomous functions
@@ -166,15 +165,13 @@ class MyRobot(wpilib.IterativeRobot):
             elif 3.1 < self.timer.get() < 3.35:
                 self.omnom_left.set(-0.5)
                 self.omnom_right.set(0.5)
-            elif 4.35 < self.timer.get() < 4.85:
+            elif 4.35 < self.timer.get() < 5.0:
                 lift_activate()
-            elif 4.85 < self.timer.get() < 5.35:
-                straight_slow_speed()
-            elif 5.35 < self.timer.get() < 5.85:
+            elif 6.35 < self.timer.get() < 6.85:
                 dispense_cube()
-            elif 5.85 < self.timer.get() < 6.85:
+            elif 6.85 < self.timer.get() < 7.85:
                 lift_lower()
-            elif self.timer.get() > 6.85:
+            elif self.timer.get() > 7.85:
                 stop_motor()
 
         def right_switch():
@@ -189,15 +186,13 @@ class MyRobot(wpilib.IterativeRobot):
             elif 3.1 < self.timer.get() < 3.35:
                 self.omnom_left.set(-0.5)
                 self.omnom_right.set(0.5)
-            elif 4.35 < self.timer.get() < 4.85:
+            elif 4.35 < self.timer.get() < 5.0:
                 lift_activate()
-            elif 4.85 < self.timer.get() < 5.35:
-                straight_slow_speed()
-            elif 5.35 < self.timer.get() < 5.85:
+            elif 6.35 < self.timer.get() < 6.85:
                 dispense_cube()
-            elif 5.85 < self.timer.get() < 6.85:
+            elif 6.85 < self.timer.get() < 7.85:
                 lift_lower()
-            elif self.timer.get() > 6.85:
+            elif self.timer.get() > 7.85:
                 stop_motor()
 
         def left_scale():
@@ -240,19 +235,10 @@ class MyRobot(wpilib.IterativeRobot):
                 stop_motor()
 
         def center_straight():
-            if self.timer.get() < 0.2:
-                lift_activate()
-            elif 0.2 < self.timer.get() < 0.5:
-                lift_lower()
-            elif 0.5 < self.timer.get() < 0.75:
-                self.omnom_left.set(-0.5)
-                self.omnom_right.set(0.5)
-            elif 0.75 < self.timer.get() < 1.5:
-                lift_activate()
-            elif 1.5 < self.timer.get() < 4.5:
+            if self.timer.get() < 3.0:
                 straight_slow_speed()
-            elif 4.5 < self.timer.get() < 4.00:
-                dispense_cube()
+            elif self.timer.get() > 3.0:
+                stop_motor()
 
         def straight():
             if self.timer.get() < 3.5:
@@ -264,17 +250,17 @@ class MyRobot(wpilib.IterativeRobot):
 
         # L-L-R
         if gameData == "LLR" and position == 1:
-            straight()                          # left switch
+            straight()  # left switch
         elif gameData == "LLR" and position == 2:
-            straight()
+            center_straight()
         elif gameData == "LLR" and position == 3:
             straight()
 
         # L-R-L
         elif gameData == "LRL" and position == 1:
-            straight()                          # left switch
+            straight()  # left switch
         elif gameData == "LRL" and position == 2:
-            straight()
+            center_straight()
         elif gameData == "LRL" and position == 3:
             straight()
 
@@ -284,7 +270,7 @@ class MyRobot(wpilib.IterativeRobot):
         elif gameData == "RLL" and position == 2:
             center_straight()
         elif gameData == "RLL" and position == 3:
-            straight()                          # right switch
+            straight()  # right switch
 
         # R-L-R
         elif gameData == "RLR" and position == 1:
@@ -292,7 +278,7 @@ class MyRobot(wpilib.IterativeRobot):
         elif gameData == "RLR" and position == 2:
             center_straight()
         elif gameData == "RLR" and position == 3:
-            straight()                          # right switch
+            straight()  # right switch
 
         # R-R-R
         elif gameData == "RRR" and position == 1:
@@ -300,13 +286,13 @@ class MyRobot(wpilib.IterativeRobot):
         elif gameData == "RRR" and position == 2:
             center_straight()
         elif gameData == "RRR" and position == 3:
-            straight()                          # right switch
+            straight()  # right switch
 
         # L-L-L
         elif gameData == "LLL" and position == 1:
-            straight()                          # left switch
+            straight()  # left switch
         elif gameData == "LLL" and position == 2:
-            straight()
+            center_straight()
         elif gameData == "LLL" and position == 3:
             straight()
 
@@ -319,9 +305,19 @@ class MyRobot(wpilib.IterativeRobot):
         if position == 4:
             lift_test()
         '''
+
     def teleopInit(self):
         '''Executed at the start of teleop mode'''
         self.drive.setSafetyEnabled(True)
+
+        # toggles for speed control
+        self.toggle = 0
+
+        # divisors that divide robot speed
+        self.divisor = 2.0
+
+        # the previous state of the joystick button
+        self.buttonWasHeld = False
 
     def teleopPeriodic(self):
         '''Runs the motors with tank steering'''
@@ -330,50 +326,48 @@ class MyRobot(wpilib.IterativeRobot):
         is_tall = self.DigitalInput.get()
 
         # controller mapping for tank steering
-        left_stick = self.stick.getRawAxis(1)
-        right_stick = self.stick.getRawAxis(5)
+        leftAxis = self.leftStick.getRawAxis(1)
+        rightAxis = self.rightStick.getRawAxis(1)
+
+        if self.leftStick.getRawButton(1) and self.buttonWasHeld == False:
+            self.buttonWasHeld = True
+            if self.toggle == 0:
+                self.divisor = 1.25
+                self.toggle = 1
+                self.buttonWasHeld = False
+            elif self.toggle == 1:
+                self.divisor = 2.0
+                self.toggle = 0
+                self.buttonWasHeld = False
 
         # controller mapping for omnom operation
-        left_omnom_stick = self.stick2.getRawAxis(1)/1.15
-        right_omnom_stick = self.stick2.getRawAxis(5)/1.15
+        left_omnom_stick = self.stick.getRawAxis(1) / 1.25
+        right_omnom_stick = self.stick.getRawAxis(5) / 1.25
 
         # lift controller mapping with relative speed
-        if self.stick2.getRawAxis(3):
-            self.liftMotor.set(self.stick2.getRawAxis(3))
-            #if is_tall == True:
-                #self.liftMotor.set(0.3)
-        elif self.stick2.getRawAxis(2):
-            self.liftMotor.set(-self.stick2.getRawAxis(2))
-            #if is_tall == True:
-                #self.liftMotor.set(0.3)
+        if self.stick.getRawAxis(3):
+            self.liftMotor.set(self.stick.getRawAxis(3))
+        elif self.stick.getRawAxis(2):
+            self.liftMotor.set(-self.stick.getRawAxis(2))
         else:
             self.liftMotor.set(0)
 
         # climb controller mapping with relative speed
-        if self.stick2.getRawButton(4):
+        if self.stick.getRawButton(4):
             self.winch1.set(0.75)
             self.winch2.set(0.75)
-        elif self.stick2.getRawButton(1):
+        elif self.stick.getRawButton(1):
             self.winch1.set(-0.75)
             self.winch2.set(-0.75)
         else:
             self.winch1.set(0)
             self.winch2.set(0)
 
-        '''
-        if left_stick < 0:
-            divisor = 2.3
-        else:
-            divisor = 2
+        # drives intake system using tank steering
+        self.omnom.tankDrive(-left_omnom_stick, -right_omnom_stick)
 
-        adjusted_left_stick = left_stick/divisor
-        '''
-
-        self.omnom.tankDrive(left_omnom_stick, right_omnom_stick)     # drives intake system using tank steering
-
-        self.drive.tankDrive(-left_stick, -right_stick)                 # drives drive system using tank steering
-
-
+        # drives drive system using tank steering
+        self.drive.tankDrive(-leftAxis / self.divisor, -rightAxis / self.divisor)
 
 
 if __name__ == '__main__':
